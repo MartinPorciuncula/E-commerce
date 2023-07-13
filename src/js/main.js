@@ -22,9 +22,9 @@ function printProducts(dbs) {
         <img src="${product.image}" alt="img"/>
         </div>
         <div class="productINF"> 
-        <h3> ${product.name} / <span><b>Stock</b>:${product.quantity}</span> </h3>
+        <h3 class="name" id="${product.id}"> ${product.name} / <span><b>Stock</b>:${product.quantity}</span> </h3>
         <h4>${product.price}
-        <p>${product.quantity ? `<i class='bx bx-cart-add' id="${product.id}"></i>` : "<div><p>Sold Out</p></div>"}</p><h4>    
+        <p>${product.quantity ? `<i class='bx bx-cart-add' id="${product.id}"></i>` : "<div><p>Sold Out</p></div>"}</p></h4>    
         </div>
 
 
@@ -110,9 +110,9 @@ function removeItems(dbs) {
 function confirmBuy(dbs) {
     const buyConfirm = document.querySelector(".buyButton")
     buyConfirm.addEventListener("click", () => {
-        if(!Object.values(dbs.cart).length) return alert("Vos sos boludo? no ves que no hay nada")
+        if (!Object.values(dbs.cart).length) return alert("Vos sos boludo? no ves que no hay nada")
         const response = confirm("Seguro que quieres comprar?")
-        if(!response) return
+        if (!response) return
         let arraymod = []
         dbs.products.forEach(product => {
             if (dbs.cart[product.id]) {
@@ -173,32 +173,32 @@ function addAndRemoveProducts(dbs) {
 
 function unitsAndPrice(dbs) {
     const infoTotal = document.querySelector(".info__total")
-   const infoAmount= document.querySelector(".info__amount")
+    const infoAmount = document.querySelector(".info__amount")
     let totalProducts = 0
     let amountProducts = 0
 
     for (const product in dbs.cart) {
-        const {amount, price} = dbs.cart[product]
+        const { amount, price } = dbs.cart[product]
         totalProducts += price * amount
         amountProducts += amount
     }
 
     infoTotal.textContent = "$" + totalProducts + ".00"
-    infoAmount.textContent = amountProducts +"units"
+    infoAmount.textContent = amountProducts + "units"
 
     window.localStorage.setItem("dbs-cart", JSON.stringify(dbs.cart))
     PrintInCart(dbs)
 }
 
-function HandlePrintAmountProducts(dbs){
+function HandlePrintAmountProducts(dbs) {
     const amountProducts = document.querySelector(".amountProducts")
 
     let amount = 0
 
     for (const product in dbs.cart) {
-        
+
         amount += dbs.cart[product].amount
-        
+
         amountProducts.textContent = amount
     }
     window.localStorage.setItem("dbs-cart", JSON.stringify(dbs.cart))
@@ -209,25 +209,25 @@ function HandlePrintAmountProducts(dbs){
 function ToggleDarkMode() {
     const darkmodebutton = document.querySelector(".bxs-moon")
 
-    darkmodebutton.addEventListener("click", () =>{
-      document.body.classList.toggle("darkmode")
+    darkmodebutton.addEventListener("click", () => {
+        document.body.classList.toggle("darkmode")
     })
 }
 
 function ResetCounters() {
     const resetcounter = document.querySelector(".amountProducts")
-         
+
     resetcounter.textContent = 0
 }
 
 function NavScroll() {
-    window.addEventListener("scroll", ()=>{
+    window.addEventListener("scroll", () => {
         if (window.scrollY > 150) {
-           document.querySelector(".header-class").classList.add("Header-effect")
-        } else{ 
-           document.querySelector(".header-class").classList.remove("Header-effect")
+            document.querySelector(".header-class").classList.add("Header-effect")
+        } else {
+            document.querySelector(".header-class").classList.remove("Header-effect")
         }
-       })
+    })
 }
 
 function MixProducts() {
@@ -240,6 +240,39 @@ function MixProducts() {
         }
     });
 
+}
+
+function Loader() {
+    window.addEventListener('load', function () {
+        document.querySelector('body').classList.add("loaded")
+    });
+}
+
+function Modals(dbs) {
+const product = document.querySelector(".products")
+    const modal = document.querySelector(".modals")
+    let htmlmodal = ""
+    product.addEventListener("click", (e) => {
+        if (e.target.classList.contains("name")) {
+       const id = Number(e.target.id)
+       const foundId= dbs.products.find(product => product.id === id)
+            htmlmodal = `<div class="single__modal">
+        <div class="productIMGmod"> 
+        <img src="${foundId.image}" alt="img"/>
+        </div>
+        <div class="productINFmod">
+        <h3 class="namemod"> ${foundId.name} - <span>${foundId.category}</span> </h3>
+        </div>
+        <div class="descriptionINFmod"
+        <p><a>${foundId.description}</a></p> <h4>Price:${foundId.price}</h4>    
+        </div>
+        <div class="Quantity"
+        <p>${foundId.quantity ? `<i class='bx bx-cart-add-mod' id="${foundId.id}"></i>` : "<div><p>Sold Out</p></div>"}</p>    
+        </div>`
+       console.log(htmlmodal);
+        }
+       modal.innerHTML = htmlmodal
+    })
 }
 
 async function main() {
@@ -259,11 +292,16 @@ async function main() {
     HandlePrintAmountProducts(dbs)
     ToggleDarkMode()
     MixProducts()
-    NavScroll() 
-    // For Live Projects
-window.addEventListener('load',function(){
-    document.querySelector('body').classList.add("loaded")  
-  });
-  
+    NavScroll()
+    Loader()
+   Modals(dbs)
+
+    /*
+    camisa de exhibicion
+    guardar darkmode
+    loading cada que hago algo (comprar,recargar)
+    cambiar icono para ligthmode
+    footer
+    */ 
 }
 main()
