@@ -16,11 +16,11 @@ function printProducts(dbs) {
 
     for (const product of dbs.products) {
 
-        htmlpr += `<div class= product>  
+        htmlpr += `<div class= "product ${product.category}">
+
         <div class="productIMG"> 
         <img src="${product.image}" alt="img"/>
         </div>
-
         <div class="productINF"> 
         <h3> ${product.name} / <span><b>Stock</b>:${product.quantity}</span> </h3>
         <h4>${product.price}
@@ -103,6 +103,7 @@ function removeItems(dbs) {
         }
         window.localStorage.setItem("dbs-cart", JSON.stringify(dbs.cart))
         PrintInCart(dbs)
+        ResetCounters()
     })
 }
 
@@ -129,6 +130,8 @@ function confirmBuy(dbs) {
         PrintInCart(dbs)
         printProducts(dbs)
         HandlePrintAmountProducts(dbs)
+        unitsAndPrice(dbs)
+        ResetCounters()
     })
 }
 
@@ -197,15 +200,52 @@ function HandlePrintAmountProducts(dbs){
         amount += dbs.cart[product].amount
         
         amountProducts.textContent = amount
-
-        console.log(amount)
     }
+    window.localStorage.setItem("dbs-cart", JSON.stringify(dbs.cart))
+    PrintInCart(dbs)
+
+}
+
+function ToggleDarkMode() {
+    const darkmodebutton = document.querySelector(".bxs-moon")
+
+    darkmodebutton.addEventListener("click", () =>{
+      document.body.classList.toggle("darkmode")
+    })
+}
+
+function ResetCounters() {
+    const resetcounter = document.querySelector(".amountProducts")
+         
+    resetcounter.textContent = 0
+}
+
+function NavScroll() {
+    window.addEventListener("scroll", ()=>{
+        if (window.scrollY > 150) {
+           document.querySelector(".header-class").classList.add("Header-effect")
+        } else{ 
+           document.querySelector(".header-class").classList.remove("Header-effect")
+        }
+       })
+}
+
+function MixProducts() {
+    let mixer = mixitup(".products", {
+        selectors: {
+            target: '.product'
+        },
+        animation: {
+            duration: 300
+        }
+    });
+
 }
 
 async function main() {
     const dbs = {
         products: JSON.parse(window.localStorage.getItem("products")) || await getProduct(),
-        cart: JSON.parse(windo.localStorage.getItem("dbs-cart")) || {},
+        cart: JSON.parse(window.localStorage.getItem("dbs-cart")) || {},
     }
 
     printProducts(dbs)
@@ -216,6 +256,14 @@ async function main() {
     confirmBuy(dbs)
     addAndRemoveProducts(dbs)
     unitsAndPrice(dbs)
-    HandlePrint(dbs)
+    HandlePrintAmountProducts(dbs)
+    ToggleDarkMode()
+    MixProducts()
+    NavScroll() 
+    // For Live Projects
+window.addEventListener('load',function(){
+    document.querySelector('body').classList.add("loaded")  
+  });
+  
 }
 main()
