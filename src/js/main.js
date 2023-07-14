@@ -50,7 +50,7 @@ function productId(dbs) {
                         icon: 'Ups!',
                         title: 'This item is',
                         text: 'Sold out!',
-                        footer: '<a href="">Try others products ;)</a>'
+                        footer: '<a href="#" class="otherproducts">Try others products ;)</a>'
                     })
                 }
 
@@ -110,7 +110,7 @@ function removeItems(dbs) {
 function confirmBuy(dbs) {
     const buyConfirm = document.querySelector(".buyButton")
     buyConfirm.addEventListener("click", () => {
-        if (!Object.values(dbs.cart).length) return alert("Vos sos boludo? no ves que no hay nada")
+        if (!Object.values(dbs.cart).length) return alert("Debes agregar algo al carrito!")
         const response = confirm("Seguro que quieres comprar?")
         if (!response) return
         let arraymod = []
@@ -131,7 +131,8 @@ function confirmBuy(dbs) {
         printProducts(dbs)
         HandlePrintAmountProducts(dbs)
         unitsAndPrice(dbs)
-        ResetCounters()
+        ResetCounters() 
+          
     })
 }
 
@@ -207,11 +208,26 @@ function HandlePrintAmountProducts(dbs) {
 }
 
 function ToggleDarkMode() {
-    const darkmodebutton = document.querySelector(".bxs-moon")
+    const darkmodebutton = document.querySelector(".darkmode-icon")
+    function AdminDarkmode() {
+     if (document.body.classList.contains("darkmode")) {
+        document.body.classList.remove("darkmode")
+        darkmodebutton.innerHTML = '<i class="bx bxs-moon"></i>'
+        localStorage.removeItem("darkmode")
+     } else{document.body.classList.add("darkmode")
+     darkmodebutton.innerHTML =  '<i class="bx bx-sun"></i>'
+     localStorage.setItem("darkmode", true)
+    } 
+    }
+    darkmodebutton.addEventListener("click", () =>  AdminDarkmode())
 
-    darkmodebutton.addEventListener("click", () => {
-        document.body.classList.toggle("darkmode")
-    })
+    let validationDarkmode = window.localStorage.getItem("darkmode")
+    if (validationDarkmode) {
+        document.body.classList.add("darkmode")
+        darkmodebutton.innerHTML = '<i class="bx bx-sun"></i>'
+    } else{
+        darkmodebutton.innerHTML ='<i class="bx bxs-moon"></i>'
+    }
 }
 
 function ResetCounters() {
@@ -249,14 +265,15 @@ function Loader() {
 }
 
 function Modals(dbs) {
-const product = document.querySelector(".products")
+    const product = document.querySelector(".products")
     const modal = document.querySelector(".modals")
     let htmlmodal = ""
     product.addEventListener("click", (e) => {
         if (e.target.classList.contains("name")) {
-       const id = Number(e.target.id)
-       const foundId= dbs.products.find(product => product.id === id)
+            const id = Number(e.target.id)
+            const foundId = dbs.products.find(product => product.id === id)
             htmlmodal = `<div class="single__modal">
+            <i class='bx bx-x-circle'></i>
         <div class="productIMGmod"> 
         <img src="${foundId.image}" alt="img"/>
         </div>
@@ -266,12 +283,57 @@ const product = document.querySelector(".products")
         <div class="descriptionINFmod"
         <p><a>${foundId.description}</a></p> <h4>Price:${foundId.price}</h4>    
         </div>
-        <div class="Quantity"
-        <p>${foundId.quantity ? `<i class='bx bx-cart-add-mod' id="${foundId.id}"></i>` : "<div><p>Sold Out</p></div>"}</p>    
+        <div class="Quantitymod"
+        <div class="Quantitymod2">Price:${foundId.quantity}</div>
+        <p>${foundId.quantity ? `<i class='bx bx-cart-add bx-modal' id="${foundId.id}"></i>` : "<div><p class=`soldOut_mod`>Sold Out</p></div>"}</p>    
         </div>`
-       console.log(htmlmodal);
         }
-       modal.innerHTML = htmlmodal
+        modal.innerHTML = htmlmodal
+    })
+}
+
+function ModalShowandQuit() {
+    const products = document.querySelector(".products")
+    const modal = document.querySelector(".modals")
+    products.addEventListener("click", (e) => {
+        if (e.target.classList.contains("name")) {
+            document.querySelector(".modals").classList.add("modals_show")
+        }
+    })
+    modal.addEventListener("click", (e) => {
+        if (e.target.classList.contains("bx-x-circle")) {
+            document.querySelector(".modals").classList.remove("modals_show")
+        }
+    })
+}
+
+function ModalFunction(dbs) {
+    const addproductmodal = document.querySelector(".modals")
+    addproductmodal.addEventListener("click", (e) => {
+        let id = Number(e.target.id)
+        let foundId = dbs.products.find(product => (product.id === id))
+        if (e.target.classList.contains("bx-cart-add")) {
+            console.log(e.target);
+            if (dbs.cart[foundId.id]) {
+                if (dbs.cart[id].amount === dbs.cart[id].quantity) {
+                    Swal.fire({
+                        icon: 'Ups!',
+                        title: 'This item is',
+                        text: 'Sold out!',
+                        footer: '<a href="#" class="otherproducts">Try others products ;)</a>'
+                    })
+                }
+                else {
+                    dbs.cart[id].amount++
+                }
+            }
+            else { dbs.cart[foundId.id] = { ...foundId, amount: 1 } }
+            window.localStorage.setItem("dbs-cart", JSON.stringify(dbs.cart))
+            PrintInCart(dbs)
+            HandlePrintAmountProducts(dbs)
+            unitsAndPrice(dbs)
+
+        }
     })
 }
 
@@ -294,14 +356,12 @@ async function main() {
     MixProducts()
     NavScroll()
     Loader()
-   Modals(dbs)
-
-    /*
-    camisa de exhibicion
-    guardar darkmode
-    loading cada que hago algo (comprar,recargar)
-    cambiar icono para ligthmode
-    footer
-    */ 
+    Modals(dbs)
+    ModalShowandQuit()
+    ModalFunction(dbs)
 }
 main()
+ /*
+ guardar darkmode
+ cambiar icono para ligthmode
+ */ 
