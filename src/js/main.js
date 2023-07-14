@@ -5,7 +5,6 @@ async function getProduct() {
         window.localStorage.setItem("products", JSON.stringify(resp))
         return resp
     } catch (error) {
-        console.log("Error")
     }
 }
 
@@ -313,7 +312,6 @@ function ModalFunction(dbs) {
         let id = Number(e.target.id)
         let foundId = dbs.products.find(product => (product.id === id))
         if (e.target.classList.contains("bx-cart-add")) {
-            console.log(e.target);
             if (dbs.cart[foundId.id]) {
                 if (dbs.cart[id].amount === dbs.cart[id].quantity) {
                     Swal.fire({
@@ -361,7 +359,3 @@ async function main() {
     ModalFunction(dbs)
 }
 main()
- /*
- guardar darkmode
- cambiar icono para ligthmode
- */ 
