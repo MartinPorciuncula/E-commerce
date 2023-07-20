@@ -1,6 +1,6 @@
 async function getProduct() {
     try {
-        const data = await fetch("https://services-academlo-shopping.onrender.com")
+        const data = await fetch("https://ecommercebackend.fundamentos-29.repl.co/")
         const resp = await data.json()
         window.localStorage.setItem("products", JSON.stringify(resp))
         return resp
